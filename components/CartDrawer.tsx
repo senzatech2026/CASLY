@@ -47,7 +47,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       .join("%0A");
     const totalStr = formatPrice(subtotal);
     const message = `Hello CASLY! I would like to place an order for:%0A%0A${orderDetails}%0A%0ATotal: ${totalStr}%0A%0APlease share payment & delivery details!`;
-    window.open(`https://wa.me/919999999999?text=${message}`, "_blank");
+    window.open(`https://wa.me/917510885426?text=${message}`, "_blank");
   };
 
   return (

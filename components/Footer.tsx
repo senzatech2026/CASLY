@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ArrowUp, Instagram, MessageCircle } from "lucide-react";
+import { CaslyLogo } from "@/components/CaslyLogo";
 
 export const Footer: React.FC = () => {
   const scrollToTop = () => {
@@ -13,9 +14,9 @@ export const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-white/10">
                 <div>
-                  <h3 className="text-xl font-normal tracking-[0.2em] font-sans text-white mb-2">
-                    CASLY
-                  </h3>
+                  <div className="mb-3">
+                    <CaslyLogo className="h-6 w-auto text-white" />
+                  </div>
                   <p className="text-[11px] text-neutral-400 leading-relaxed">
                     Handmade T-Shirts, Tie & Dye studio editions, and bespoke hand-painted streetwear.
                   </p>
@@ -54,9 +55,9 @@ export const Footer: React.FC = () => {
                                   </a>
                               </li>
                               <li>
-                                  <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1.5">
+                                  <a href="https://wa.me/917510885426" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1.5">
                                     <MessageCircle className="w-3.5 h-3.5" />
-                                    <span>WhatsApp Orders</span>
+                                    <span>+91 75108 85426</span>
                                   </a>
                               </li>
                             </ul>

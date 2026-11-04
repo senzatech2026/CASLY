@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "CASLY | Handmade Fashion & Streetwear Atelier",
   description:
     "Slow-stitched streetwear. Individually crafted handmade tie & dye t-shirts, custom hand-painted denim, and limited studio drops.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/icon.png",
+  },
   openGraph: {
     title: "CASLY | Handmade Fashion & Streetwear Atelier",
     description:

@@ -13,7 +13,7 @@ export const CtaSection: React.FC = () => {
           ? `Hi CASLY! I would like to order a custom handmade piece: "${customIdea}"`
           : `Hi CASLY! I would like to order a custom handmade piece from your atelier.`
     );
-    window.open(`https://wa.me/919999999999?text=${text}`, "_blank");
+    window.open(`https://wa.me/917510885426?text=${text}`, "_blank");
   };
 
   return (

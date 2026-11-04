@@ -301,7 +301,7 @@ export const CircularModelCarousel: React.FC<CircularModelCarouselProps> = ({
         </div>
 
         {/* Floating "In this look" Sidebar (Exact Velvetica Style) */}
-        <div className="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 w-[330px] z-40 bg-white/95 backdrop-blur-md border border-black/10 rounded-2xl p-5 shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
+        <div className="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 translate-x-12 xl:translate-x-14 w-[330px] z-40 bg-white/95 backdrop-blur-md border border-black/10 rounded-2xl p-5 shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
           <div className="flex items-center justify-between border-b border-black/5 pb-3 mb-4">
             <h3 className="text-sm font-semibold text-neutral-900 font-sans tracking-tight">
               In this look
