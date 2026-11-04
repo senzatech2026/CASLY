@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ShoppingBag, Menu, X, Sparkles } from "lucide-react";
+import { CaslyLogo } from "@/components/CaslyLogo";
 
 interface NavbarProps {
   cartCount: number;
@@ -35,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           : "bg-transparent py-6"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+      <div className="relative max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Left: Navigation links */}
         <nav className="hidden lg:flex items-center gap-8 text-[11px] font-mono tracking-widest text-[#5C5A55]">
           <a
@@ -56,18 +57,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           </a>
         </nav>
 
-        {/* Center: Brand Wordmark */}
-        <div className="flex flex-col items-center">
+        {/* Center: Official Brand Wordmark perfectly centered relative to the entire viewport */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto">
           <a
             href="#"
-            className="text-2xl md:text-3xl font-normal tracking-[0.22em] text-[#121212] font-sans"
+            className="flex items-center hover:opacity-85 transition-opacity"
+            aria-label="CASLY Home"
           >
-            CASLY
+            <CaslyLogo className="h-6 md:h-7 w-auto text-[#121212]" />
           </a>
         </div>
 
         {/* Right: Currency, Cart */}
-        <div className="flex items-center gap-4 md:gap-6 text-xs font-mono">
+        <div className="flex items-center gap-4 md:gap-6 text-xs font-mono ml-auto">
           <button
             onClick={onToggleCurrency}
             className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#6E6B65] hover:text-black border border-black/10 px-2.5 py-1 rounded-full transition-colors"
