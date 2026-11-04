@@ -3,9 +3,22 @@ import "./globals.css";
 import { SmoothScroll } from "@/components/SmoothScroll";
 
 export const metadata: Metadata = {
-  title: "CASLY | The Runway • Shop the Look",
+  title: "CASLY | Handmade Fashion & Streetwear Atelier",
   description:
-  "Explore the 3D rotating runway & styled looks. Handmade T-Shirts, Tie & Dye, and custom hand-painted anime streetwear.",
+    "Slow-stitched streetwear. Individually crafted handmade tie & dye t-shirts, custom hand-painted denim, and limited studio drops.",
+  openGraph: {
+    title: "CASLY | Handmade Fashion & Streetwear Atelier",
+    description:
+      "Slow-stitched streetwear. Individually crafted handmade tie & dye t-shirts, custom hand-painted denim, and limited studio drops.",
+    siteName: "CASLY",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CASLY | Handmade Fashion & Streetwear Atelier",
+    description:
+      "Slow-stitched streetwear. Individually crafted handmade tie & dye t-shirts, custom hand-painted denim, and limited studio drops.",
+  },
 };
 
 export default function RootLayout({

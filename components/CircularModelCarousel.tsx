@@ -41,7 +41,7 @@ export const CircularModelCarousel: React.FC<CircularModelCarouselProps> = ({
   const handleWheel = (e: React.WheelEvent) => {
     if (isThrottled.current) return;
     const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if (Math.abs(delta) > 25) {
+    if (Math.abs(delta) > 20) {
       if (delta > 0) {
         handleNext();
       } else {
@@ -50,69 +50,82 @@ export const CircularModelCarousel: React.FC<CircularModelCarouselProps> = ({
       isThrottled.current = true;
       setTimeout(() => {
         isThrottled.current = false;
-      }, 450);
+      }, 400);
     }
   };
 
-  // Single-step Touch Swipe
-  const touchStartX = useRef<number | null>(null);
-  const touchCurrentX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
+  // Smooth Interactive Drag & Momentum Swipe
+  const [dragOffset, setDragOffset] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchCurrentX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchCurrentX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStartX.current !== null && touchCurrentX.current !== null) {
-      const diffX = touchCurrentX.current - touchStartX.current;
-      if (Math.abs(diffX) > 30) {
-        if (diffX < 0) {
-          handleNext();
-        } else {
-          handlePrev();
-        }
-      }
-    }
-    touchStartX.current = null;
-    touchCurrentX.current = null;
-    touchStartY.current = null;
-  };
-
-  // Single-step Pointer Drag
-  const pointerStartX = useRef<number | null>(null);
-  const pointerCurrentX = useRef<number | null>(null);
+  const dragStartX = useRef<number | null>(null);
+  const dragCurrentX = useRef<number | null>(null);
+  const dragLastTime = useRef<number>(0);
+  const dragVelocity = useRef<number>(0);
+  const hasDragged = useRef<boolean>(false);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    pointerStartX.current = e.clientX;
-    pointerCurrentX.current = e.clientX;
+    // Ignore clicks on buttons/links/size chips
+    if ((e.target as HTMLElement).closest("button") || (e.target as HTMLElement).closest("a")) {
+      return;
+    }
+    dragStartX.current = e.clientX;
+    dragCurrentX.current = e.clientX;
+    dragLastTime.current = Date.now();
+    dragVelocity.current = 0;
+    hasDragged.current = false;
+    setIsDragging(true);
+
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {}
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (pointerStartX.current !== null) {
-      pointerCurrentX.current = e.clientX;
+    if (dragStartX.current === null) return;
+    const now = Date.now();
+    const dt = Math.max(1, now - dragLastTime.current);
+    const dx = e.clientX - (dragCurrentX.current ?? e.clientX);
+    dragVelocity.current = dx / dt;
+    dragCurrentX.current = e.clientX;
+    dragLastTime.current = now;
+
+    const totalDiff = e.clientX - dragStartX.current;
+    if (Math.abs(totalDiff) > 8) {
+      hasDragged.current = true;
     }
+    setDragOffset(totalDiff);
   };
 
-  const handlePointerUp = () => {
-    if (pointerStartX.current !== null && pointerCurrentX.current !== null) {
-      const diffX = pointerCurrentX.current - pointerStartX.current;
-      if (Math.abs(diffX) > 30) {
-        if (diffX < 0) {
-          handleNext();
-        } else {
-          handlePrev();
-        }
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (dragStartX.current === null) return;
+
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+
+    const totalDiff = (dragCurrentX.current ?? dragStartX.current) - dragStartX.current;
+    const velocity = dragVelocity.current;
+
+    setIsDragging(false);
+    setDragOffset(0);
+
+    // Effortless swipe with momentum/velocity support
+    if (Math.abs(totalDiff) > 35 || Math.abs(velocity) > 0.3) {
+      if (totalDiff < -35 || velocity < -0.3) {
+        handleNext();
+      } else if (totalDiff > 35 || velocity > 0.3) {
+        handlePrev();
       }
     }
-    pointerStartX.current = null;
-    pointerCurrentX.current = null;
+
+    // Preserve hasDragged flag briefly so click handlers don't accidentally fire
+    setTimeout(() => {
+      hasDragged.current = false;
+    }, 60);
+
+    dragStartX.current = null;
+    dragCurrentX.current = null;
   };
 
   // Keyboard navigation
@@ -147,13 +160,10 @@ export const CircularModelCarousel: React.FC<CircularModelCarouselProps> = ({
     <section
       id="try-the-look"
       onWheel={handleWheel}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+      onPointerCancel={handlePointerUp}
       className="relative w-full min-h-[92vh] lg:min-h-screen bg-[#F4F1EC] text-[#121212] flex flex-col justify-between py-8 px-6 md:px-12 select-none overflow-hidden cursor-grab active:cursor-grabbing touch-pan-y"
     >
       {/* Top Header: "Try the Look." (Velvetica Minimalist Style) */}
@@ -163,7 +173,7 @@ export const CircularModelCarousel: React.FC<CircularModelCarouselProps> = ({
             Try the Look.
           </h2>
           <p className="text-xs md:text-sm text-[#76736E] mt-1 font-mono tracking-wide">
-            Touch any avatar to pop it forward into the spotlight.
+            Swipe smoothly or tap any background look to bring it forward.
           </p>
         </div>
 
@@ -182,8 +192,8 @@ export const CircularModelCarousel: React.FC<CircularModelCarouselProps> = ({
         {/* Soft studio floor horizon */}
         <div className="absolute bottom-12 inset-x-0 h-40 bg-gradient-to-t from-black/[0.04] to-transparent pointer-events-none rounded-[100%]" />
 
-        {/* 3D Runway Perspective Viewport */}
-        <div className="relative w-full h-[540px] md:h-[620px] runway-perspective flex items-end justify-center pb-8">
+        {/* 3D Runway Perspective Viewport - Centered to balance with right panel on desktop */}
+        <div className="relative w-full h-[540px] md:h-[620px] runway-perspective flex items-end justify-center pb-8 lg:-translate-x-24 xl:-translate-x-28 transition-transform duration-500">
           {MODEL_LOOKS.map((model, idx) => {
             // Distance from active center index in a continuous ring
             const diff =
@@ -193,56 +203,56 @@ export const CircularModelCarousel: React.FC<CircularModelCarouselProps> = ({
             // Calculate horizontal offset and depth scaling
             const absDiff = Math.abs(diff);
 
-            // X positioning
-            let xOffset = 0;
-            if (diff === 0) xOffset = 0;
-            else if (diff === 1) xOffset = 260;
-            else if (diff === -1) xOffset = -260;
-            else if (diff === 2) xOffset = 470;
-            else if (diff === -2) xOffset = -470;
-            else xOffset = diff * 240;
+            // X base positioning
+            let baseXOffset = 0;
+            if (diff === 0) baseXOffset = 0;
+            else if (diff === 1) baseXOffset = 250;
+            else if (diff === -1) baseXOffset = -250;
+            else if (diff === 2) baseXOffset = 460;
+            else if (diff === -2) baseXOffset = -460;
+            else baseXOffset = diff * 230;
+
+            // Interactive drag offset influence with immediate tactile feedback
+            const dragInfluence = isDragging ? dragOffset * 0.75 : 0;
+            const currentX = baseXOffset + dragInfluence;
 
             // Z distance & scale
-            const scale = diff === 0 ? 1.05 : absDiff === 1 ? 0.86 : 0.72;
-            const opacity = diff === 0 ? 1 : absDiff === 1 ? 0.72 : 0.35;
-            const blurAmount = diff === 0 ? 0 : absDiff === 1 ? 1.5 : 4.5;
-            const zIndex = 30 - absDiff * 5;
-
             const isFront = diff === 0;
+            const scale = isFront ? 1.05 : absDiff === 1 ? 0.88 : 0.74;
+            const opacity = isFront ? 1 : absDiff === 1 ? 0.8 : 0.38;
+            const blurAmount = isFront ? 0 : absDiff === 1 ? 1 : 4;
+            const zIndex = 30 - absDiff * 5;
 
             return (
               <div
                 key={model.id}
                 onClick={(e) => {
                   e.stopPropagation();
+                  if (hasDragged.current) return;
                   if (isFront) {
                     setIsLookModalOpen(true);
                   } else {
                     setActiveIndex(idx);
                   }
                 }}
-                onTouchEnd={(e) => {
-                  e.stopPropagation();
-                  if (isFront) {
-                    setIsLookModalOpen(true);
-                  } else {
-                    setActiveIndex(idx);
-                  }
-                }}
-                className={`absolute bottom-8 left-1/2 -translate-x-1/2 runway-model-item cursor-pointer flex flex-col items-center group transition-all duration-500 ${
+                className={`absolute bottom-8 left-1/2 -translate-x-1/2 runway-model-item cursor-pointer flex flex-col items-center group select-none ${
                   !isFront ? "hover:-translate-y-3" : ""
                 }`}
                 style={{
-                  transform: `translate3d(${xOffset}px, ${absDiff * 14}px, ${-absDiff * 160}px) scale(${scale})`,
+                  transform: `translate3d(${currentX}px, ${absDiff * 14}px, ${-absDiff * 150}px) scale(${scale})`,
                   opacity: opacity,
                   filter: `blur(${blurAmount}px)`,
                   zIndex: zIndex,
+                  transition: isDragging
+                    ? "none"
+                    : "transform 650ms cubic-bezier(0.16, 1, 0.3, 1), opacity 500ms cubic-bezier(0.16, 1, 0.3, 1), filter 500ms ease",
+                  willChange: "transform, opacity, filter",
                 }}
               >
-                {/* Floating "Tap to Pop Up" badge for other side models */}
+                {/* Floating "Click to view look" badge for background/side models */}
                 {!isFront && (
                   <div className="mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-40 bg-white/95 text-black px-3 py-1 rounded-full text-[10px] font-mono font-medium shadow-md whitespace-nowrap">
-                    Tap to pop up • {model.subtitle}
+                    Click to view look • {model.subtitle}
                   </div>
                 )}
 
