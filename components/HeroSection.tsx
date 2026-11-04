@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowDown, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { CaslyLogo } from "@/components/CaslyLogo";
 
 const FASHION_WORDS = [
   "ATELIER",
@@ -110,20 +111,29 @@ export const HeroSection: React.FC = () => {
 
         {/* Fixed Title Container - Zero Layout Jump */}
         <div className="h-[20vw] sm:h-[18vw] md:h-[15vw] lg:h-[13vw] flex items-center justify-center w-full max-w-5xl mx-auto overflow-hidden">
-          <h1
-            onClick={startAnimation}
-            onMouseEnter={startAnimation}
-            title="Click to replay sequence"
-            className={`font-normal tracking-[-0.03em] leading-[0.85] text-[#121212] select-none uppercase font-sans whitespace-nowrap cursor-pointer transition-transform duration-75 ${
-              currentWord === "CASLY"
-                ? "text-[17vw] md:text-[14vw] lg:text-[12vw]"
-                : currentWord.length > 8
-                ? "text-[10vw] sm:text-[11vw] md:text-[9.5vw] lg:text-[8.5vw]"
-                : "text-[13vw] sm:text-[14vw] md:text-[12vw] lg:text-[10.5vw]"
-            }`}
-          >
-            {currentWord}
-          </h1>
+          {currentWord === "CASLY" ? (
+            <div
+              onClick={startAnimation}
+              onMouseEnter={startAnimation}
+              title="Click to replay sequence"
+              className="cursor-pointer transition-transform duration-100 hover:scale-[1.01] flex items-center justify-center w-full px-4"
+            >
+              <CaslyLogo className="h-[12vw] sm:h-[11vw] md:h-[9.5vw] lg:h-[8.2vw] w-auto max-w-full text-[#121212] select-none" />
+            </div>
+          ) : (
+            <h1
+              onClick={startAnimation}
+              onMouseEnter={startAnimation}
+              title="Click to replay sequence"
+              className={`font-normal tracking-[-0.03em] leading-[0.85] text-[#121212] select-none uppercase font-sans whitespace-nowrap cursor-pointer transition-transform duration-75 ${
+                currentWord.length > 8
+                  ? "text-[10vw] sm:text-[11vw] md:text-[9.5vw] lg:text-[8.5vw]"
+                  : "text-[13vw] sm:text-[14vw] md:text-[12vw] lg:text-[10.5vw]"
+              }`}
+            >
+              {currentWord}
+            </h1>
+          )}
         </div>
 
         {/* Staggered Description */}
