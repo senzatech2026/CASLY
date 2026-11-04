@@ -4,54 +4,75 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowDown, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
-const TARGET_WORD = "CASLY";
-const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#%&*+=-~_";
+const FASHION_WORDS = [
+  "ATELIER",
+  "DENIM",
+  "HANDMADE",
+  "CUSTOM",
+  "TIE & DYE",
+  "STREETWEAR",
+  "CRAFTED",
+  "STUDIO",
+  "BESPOKE",
+  "EDITION",
+  "SLOW STITCH",
+  "COUTURE",
+  "PIGMENT",
+  "RUNWAY",
+  "RAW DENIM",
+  "HANDCRAFT",
+  "OVERSIZED",
+  "LIMITED",
+  "STYLE",
+  "ATELIER",
+  "CASLY",
+];
 
 export const HeroSection: React.FC = () => {
-  const [displayText, setDisplayText] = useState<string>(TARGET_WORD);
-  const [isScrambling, setIsScrambling] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentWord, setCurrentWord] = useState<string>("CASLY");
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const timeoutIdsRef = useRef<NodeJS.Timeout[]>([]);
 
-  const startScramble = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    setIsScrambling(true);
+  const startAnimation = useCallback(() => {
+    // Clear any pending timeouts
+    timeoutIdsRef.current.forEach(clearTimeout);
+    timeoutIdsRef.current = [];
 
-    // Negative iteration provides ~200ms of initial full-word scramble before C starts locking
-    let iteration = -2.5;
-    const totalChars = TARGET_WORD.length;
+    setIsAnimating(true);
 
-    intervalRef.current = setInterval(() => {
-      setDisplayText(() => {
-        return TARGET_WORD.split("")
-          .map((char, index) => {
-            if (index < iteration) {
-              return TARGET_WORD[index];
-            }
-            return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-          })
-          .join("");
-      });
+    let accumulatedTime = 0;
+    const totalWords = FASHION_WORDS.length;
 
-      if (iteration >= totalChars) {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-        setDisplayText(TARGET_WORD);
-        setIsScrambling(false);
+    FASHION_WORDS.forEach((word, index) => {
+      // Dynamic kinetic timing: ultra-fast initial flash, smoothly decelerating into CASLY
+      let delayPerWord = 50;
+      if (index >= totalWords - 5 && index < totalWords - 2) {
+        delayPerWord = 75;
+      } else if (index === totalWords - 2) {
+        delayPerWord = 110;
       }
 
-      iteration += 1 / 3;
-    }, 32);
+      accumulatedTime += delayPerWord;
+
+      const timer = setTimeout(() => {
+        setCurrentWord(word);
+        if (index === totalWords - 1) {
+          setIsAnimating(false);
+        }
+      }, accumulatedTime);
+
+      timeoutIdsRef.current.push(timer);
+    });
   }, []);
 
   useEffect(() => {
-    // Initial page-load decode animation
-    startScramble();
+    // Start kinetic fashion title sequence on page load
+    startAnimation();
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      timeoutIdsRef.current.forEach(clearTimeout);
     };
-  }, [startScramble]);
+  }, [startAnimation]);
 
   return (
     <section className="relative min-h-[90vh] w-full flex flex-col justify-between pt-28 pb-12 px-6 md:px-12 bg-[#F7F5F2] text-[#121212] overflow-hidden">
@@ -80,44 +101,47 @@ export const HeroSection: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 12, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/[0.03] border border-black/5 text-[10px] font-mono tracking-widest text-neutral-600 mb-6 uppercase"
         >
           <Sparkles className="w-3 h-3 text-amber-600" />
           <span>Handmade • Tie & Dye • Custom Prints</span>
         </motion.div>
 
-        {/* Text Scramble / Decoding CASLY Logo (Alosh Denny inspired) */}
-        <h1
-          onMouseEnter={startScramble}
-          onClick={startScramble}
-          title="Hover or click to decode"
-          className="glitch-text text-[17vw] md:text-[14vw] lg:text-[12vw] font-normal tracking-[-0.03em] leading-[0.85] text-[#121212] select-none uppercase font-sans flex justify-center items-center cursor-pointer transition-opacity"
-        >
-          <span
-            className="scramble-text inline-block"
-            data-value={TARGET_WORD}
+        {/* Fixed Title Container - Zero Layout Jump */}
+        <div className="h-[20vw] sm:h-[18vw] md:h-[15vw] lg:h-[13vw] flex items-center justify-center w-full max-w-5xl mx-auto overflow-hidden">
+          <h1
+            onClick={startAnimation}
+            onMouseEnter={startAnimation}
+            title="Click to replay sequence"
+            className={`font-normal tracking-[-0.03em] leading-[0.85] text-[#121212] select-none uppercase font-sans whitespace-nowrap cursor-pointer transition-transform duration-75 ${
+              currentWord === "CASLY"
+                ? "text-[17vw] md:text-[14vw] lg:text-[12vw]"
+                : currentWord.length > 8
+                ? "text-[10vw] sm:text-[11vw] md:text-[9.5vw] lg:text-[8.5vw]"
+                : "text-[13vw] sm:text-[14vw] md:text-[12vw] lg:text-[10.5vw]"
+            }`}
           >
-            {displayText}
-          </span>
-        </h1>
+            {currentWord}
+          </h1>
+        </div>
 
         {/* Staggered Description */}
         <motion.p
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.82, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.65, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-xl mx-auto mt-6 text-sm md:text-base text-[#66635D] font-normal leading-relaxed"
         >
           Slow-stitched streetwear. From ice-melt tie-dye pigments to one-of-one
           hand-painted anime denim jackets, crafted individually in small studio drops.
         </motion.p>
 
-        {/* Staggered Action CTA Buttons */}
+        {/* Action CTA Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.95, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.65, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="mt-8 flex items-center gap-4"
         >
           <a
@@ -139,7 +163,7 @@ export const HeroSection: React.FC = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.7, delay: 1.05 }}
+        transition={{ duration: 0.7, delay: 0.5 }}
         className="flex items-end justify-between border-t border-black/5 pt-4 text-[11px] font-mono text-[#76736E] max-w-7xl mx-auto w-full"
       >
         <div className="hidden sm:block">
