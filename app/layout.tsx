@@ -7,9 +7,13 @@ export const metadata: Metadata = {
   description:
     "Slow-stitched streetwear. Individually crafted handmade tie & dye t-shirts, custom hand-painted denim, and limited studio drops.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/icon.png",
+    icon: [
+      { url: "/favicon.svg?v=20261105", type: "image/svg+xml" },
+      { url: "/favicon.ico?v=20261105", sizes: "any" },
+      { url: "/icon.png?v=20261105", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.ico?v=20261105",
+    apple: "/icon.png?v=20261105",
   },
   openGraph: {
     title: "CASLY | Handmade Fashion & Streetwear Atelier",
